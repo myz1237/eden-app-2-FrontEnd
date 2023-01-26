@@ -71,101 +71,6 @@ const tooltip = new G6.Tooltip({
   },
 });
 
-const prepareLabelOfNode = (node, fontSize) => {
-  let updateObj = {};
-
-  let flagUpdate = false;
-
-  if (node.label == undefined) return "";
-
-  const words = node.label.replace("& ", "").replace("| ", "").split(" ");
-
-  let i = 0;
-
-  let res2 = "";
-
-  if (words.length > 1) {
-    let maxEllipsisLength = 0;
-
-    while (i < words.length && i < 3) {
-      const word = words[i];
-
-      const ellipsisLength = G6.Util.getTextSize(word, fontSize)[0];
-
-      if (maxEllipsisLength < ellipsisLength) {
-        maxEllipsisLength = ellipsisLength;
-      }
-
-      res2 = res2 + word + "\n";
-      i++;
-    }
-    res2 = res2.slice(0, -1);
-
-    let parsDiff = parseInt(node.size) - parseInt(maxEllipsisLength);
-
-    let sizeNew = node.size;
-
-    if (parsDiff < 0) {
-      parsDiff = parsDiff * 0.16;
-      sizeNew = node.size * 1.2;
-    } else {
-      // parsDiff = parsDiff * 0.03;
-      // sizeNew = node.size * 0.95;
-      parsDiff = parsDiff * 0;
-      sizeNew = node.size * 1;
-    }
-    const fontSizeNew = (fontSize + parsDiff).toFixed();
-
-    flagUpdate = true;
-    updateObj = {
-      label: res2,
-      size: sizeNew,
-      labelCfg: {
-        style: {
-          fontSize: fontSizeNew,
-        },
-      },
-    };
-  } else if (words.length == 1) {
-    flagUpdate = true;
-
-    const ellipsisLength = G6.Util.getTextSize(node.label, fontSize)[0];
-
-    let parsDiff = parseInt(node.size) - parseInt(ellipsisLength);
-
-    let sizeNew = node.size;
-
-    if (parsDiff < 0) {
-      parsDiff = parsDiff * 0.18;
-      sizeNew = node.size * 1.2;
-    } else {
-      // parsDiff = parsDiff * 0.03;
-      // sizeNew = node.size * 0.95;
-      parsDiff = parsDiff * 0;
-      sizeNew = node.size * 1;
-    }
-
-    const fontSizeNew = (fontSize + parsDiff).toFixed();
-
-    updateObj = {
-      size: sizeNew,
-      labelCfg: {
-        style: {
-          fontSize: fontSizeNew,
-        },
-      },
-    };
-  }
-
-  if (flagUpdate == true) {
-    graph.updateItem(node.id, {
-      ...updateObj,
-    });
-  }
-
-  return res2;
-};
-
 function refreshDragedNodePosition(e) {
   const model = e.item.get("model");
 
@@ -175,16 +80,112 @@ function refreshDragedNodePosition(e) {
 
 //  -------------- Graph Functions ------------
 
-let graph;
+// let graph;
 
 const G6component = ({ width, height, data2 }) => {
   const ref = React.useRef(null);
+  const [graph, setGraph] = useState(null);
+
+  const prepareLabelOfNode = (node, fontSize) => {
+    let updateObj = {};
+
+    let flagUpdate = false;
+
+    if (node.label == undefined) return "";
+
+    const words = node.label.replace("& ", "").replace("| ", "").split(" ");
+
+    let i = 0;
+
+    let res2 = "";
+
+    if (words.length > 1) {
+      let maxEllipsisLength = 0;
+
+      while (i < words.length && i < 3) {
+        const word = words[i];
+
+        const ellipsisLength = G6.Util.getTextSize(word, fontSize)[0];
+
+        if (maxEllipsisLength < ellipsisLength) {
+          maxEllipsisLength = ellipsisLength;
+        }
+
+        res2 = res2 + word + "\n";
+        i++;
+      }
+      res2 = res2.slice(0, -1);
+
+      let parsDiff = parseInt(node.size) - parseInt(maxEllipsisLength);
+
+      let sizeNew = node.size;
+
+      if (parsDiff < 0) {
+        parsDiff = parsDiff * 0.16;
+        sizeNew = node.size * 1.2;
+      } else {
+        // parsDiff = parsDiff * 0.03;
+        // sizeNew = node.size * 0.95;
+        parsDiff = parsDiff * 0;
+        sizeNew = node.size * 1;
+      }
+      const fontSizeNew = (fontSize + parsDiff).toFixed();
+
+      flagUpdate = true;
+      updateObj = {
+        label: res2,
+        size: sizeNew,
+        labelCfg: {
+          style: {
+            fontSize: fontSizeNew,
+          },
+        },
+      };
+    } else if (words.length == 1) {
+      flagUpdate = true;
+
+      const ellipsisLength = G6.Util.getTextSize(node.label, fontSize)[0];
+
+      let parsDiff = parseInt(node.size) - parseInt(ellipsisLength);
+
+      let sizeNew = node.size;
+
+      if (parsDiff < 0) {
+        parsDiff = parsDiff * 0.18;
+        sizeNew = node.size * 1.2;
+      } else {
+        // parsDiff = parsDiff * 0.03;
+        // sizeNew = node.size * 0.95;
+        parsDiff = parsDiff * 0;
+        sizeNew = node.size * 1;
+      }
+
+      const fontSizeNew = (fontSize + parsDiff).toFixed();
+
+      updateObj = {
+        size: sizeNew,
+        labelCfg: {
+          style: {
+            fontSize: fontSizeNew,
+          },
+        },
+      };
+    }
+
+    if (flagUpdate == true) {
+      graph.updateItem(node.id, {
+        ...updateObj,
+      });
+    }
+
+    return res2;
+  };
 
   //  -------------- Graph Setup ----------------
   useEffect(() => {
     if (!graph) {
       // eslint-disable-next-line react-hooks/exhaustive-deps
-      graph = new G6.Graph({
+      const _graph = new G6.Graph({
         container: ref.current,
         width: width,
         height: height,
@@ -240,6 +241,12 @@ const G6component = ({ width, height, data2 }) => {
         plugins: [tooltip],
       });
 
+      setGraph(_graph);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (graph) {
       if (data2.nodes.length != 1 || data2.nodes[0].id != "node1")
         updateNodes(data2);
 
@@ -264,7 +271,7 @@ const G6component = ({ width, height, data2 }) => {
         // addNodeAndEdge(nodeConnectID, { id: "node88", size: 55 } as Node);
       });
     }
-  }, []);
+  }, [graph]);
 
   useEffect(() => {
     if (graph && (data2.nodes.length != 1 || data2.nodes[0].id != "node1")) {
