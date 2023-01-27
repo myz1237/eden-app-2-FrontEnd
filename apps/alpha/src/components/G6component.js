@@ -1,5 +1,5 @@
 import G6 from "@antv/g6";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 
 const globalFontSize = 10;
 
@@ -84,7 +84,74 @@ function refreshDragedNodePosition(e) {
 
 const G6component = ({ width, height, data2 }) => {
   const ref = React.useRef(null);
+
+  //  -------------- Graph Setup ----------------
   const [graph, setGraph] = useState(null);
+
+  useEffect(() => {
+    debugger;
+
+    if (ref && !graph) {
+      const _graph = new G6.Graph({
+        container: ref.current,
+        width: width,
+        height: height,
+        modes: {
+          default: ["drag-canvas", "zoom-canvas", "activate-relations"],
+        },
+        animate: true, // Boolean, whether to activate the animation when global changes happen
+        defaultNode: {
+          type: "circle",
+          labelCfg: {
+            style: {
+              fill: "#000000A6",
+              fontSize: 10,
+            },
+          },
+          style: {
+            stroke: "#72CC4A",
+            width: 150,
+          },
+        },
+        defaultEdge: {
+          type: "line",
+        },
+        layout: {
+          type: "force",
+          edgeStrength: 0.6,
+          preventOverlap: true,
+          linkDistance: (d) => {
+            // Change dinamicaloly the distance based on the number of connections
+            let numConnections = 0;
+
+            if (d.source.numberConnections > d.target.numberConnections) {
+              numConnections = d.source.numberConnections;
+            } else {
+              numConnections = d.target.numberConnections;
+            }
+
+            let initDistance = 90;
+
+            let randomDistance = 100;
+
+            if (numConnections > 23) {
+              initDistance = 130;
+            } else if (numConnections > 10) {
+              initDistance = 100;
+            } else {
+              randomDistance = 50;
+            }
+            // return 150;
+            return initDistance + Math.floor(Math.random() * randomDistance);
+          },
+        },
+        plugins: [tooltip],
+      });
+
+      debugger;
+      setGraph(_graph);
+    }
+  }, [ref]);
 
   const prepareLabelOfNode = (node, fontSize) => {
     let updateObj = {};
@@ -180,70 +247,6 @@ const G6component = ({ width, height, data2 }) => {
 
     return res2;
   };
-
-  //  -------------- Graph Setup ----------------
-  useEffect(() => {
-    if (!graph) {
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      const _graph = new G6.Graph({
-        container: ref.current,
-        width: width,
-        height: height,
-        modes: {
-          default: ["drag-canvas", "zoom-canvas", "activate-relations"],
-        },
-        animate: true, // Boolean, whether to activate the animation when global changes happen
-        defaultNode: {
-          type: "circle",
-          labelCfg: {
-            style: {
-              fill: "#000000A6",
-              fontSize: 10,
-            },
-          },
-          style: {
-            stroke: "#72CC4A",
-            width: 150,
-          },
-        },
-        defaultEdge: {
-          type: "line",
-        },
-        layout: {
-          type: "force",
-          edgeStrength: 0.6,
-          preventOverlap: true,
-          linkDistance: (d) => {
-            // Change dinamicaloly the distance based on the number of connections
-            let numConnections = 0;
-
-            if (d.source.numberConnections > d.target.numberConnections) {
-              numConnections = d.source.numberConnections;
-            } else {
-              numConnections = d.target.numberConnections;
-            }
-
-            let initDistance = 90;
-
-            let randomDistance = 100;
-
-            if (numConnections > 23) {
-              initDistance = 130;
-            } else if (numConnections > 10) {
-              initDistance = 100;
-            } else {
-              randomDistance = 50;
-            }
-            // return 150;
-            return initDistance + Math.floor(Math.random() * randomDistance);
-          },
-        },
-        plugins: [tooltip],
-      });
-
-      setGraph(_graph);
-    }
-  }, []);
 
   useEffect(() => {
     if (graph) {
