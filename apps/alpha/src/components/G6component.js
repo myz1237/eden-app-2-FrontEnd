@@ -17,7 +17,7 @@ const nodeTypeStyle = {
     fill: "#faffef",
     stroke: "#cdff52",
     size: 20,
-    displayName: "Type Project",
+    displayName: "Sub Project Type",
     sizeRatio: 0.05,
   },
   // eslint-disable-next-line camelcase
@@ -25,15 +25,22 @@ const nodeTypeStyle = {
     fill: "#f0fdff",
     stroke: "#9AECFE",
     size: 25,
-    displayName: "Expertise",
+    displayName: "Skill",
     sizeRatio: 0.1,
   },
   expertise: {
     fill: "#f0fdaf",
     stroke: "#9AECaE",
     size: 40,
-    displayName: "Role",
-    sizeRatio: 0.3,
+    displayName: "Expertise",
+    sizeRatio: 0.2,
+  },
+  typeProject: {
+    fill: "#f0fdaf",
+    stroke: "#9AECaE",
+    size: 40,
+    displayName: "Project Type",
+    sizeRatio: 0.2,
   },
   Project: {
     fill: "#FDFFDC",
@@ -227,12 +234,24 @@ const G6component = ({ width, height, data2 }) => {
           type: "line",
         },
         layout: {
+          // type: "grid",
+          // begin: [0, 0],
+          // preventOverlap: true, // nodeSize or size in data is required for preventOverlap: true
+          // preventOverlapPdding: 20,
+          // nodeSize: 30,
+          // condense: false,
+          // rows: 5,
+          // cols: 5,
+          // sortBy: "degree",
           type: "force",
           edgeStrength: 0.6,
           preventOverlap: true,
+          strictRadial: true,
           linkDistance: (d) => {
             // Change dinamicaloly the distance based on the number of connections
             let numConnections = 0;
+
+            console.log("d = ", d);
 
             if (d.source.numberConnections > d.target.numberConnections) {
               numConnections = d.source.numberConnections;
@@ -283,8 +302,6 @@ const G6component = ({ width, height, data2 }) => {
       });
     }
   }, []);
-
-  console.log("width,height = ", width, height);
 
   useEffect(() => {
     if (graph && (data2.nodes.length != 1 || data2.nodes[0].id != "node1")) {
@@ -367,12 +384,6 @@ const G6component = ({ width, height, data2 }) => {
       const nodeType = node.nodeType;
 
       if (nodeTypeStyle[nodeType] == undefined) return null;
-      // console.log(
-      //   "nodeType = ",
-      //   nodeType,
-      //   nodeTypeStyle[nodeType].sizeRatio,
-      //   node
-      // );
 
       if (nodeTypeStyle[nodeType].sizeRatio > maxNodeSizeRatio) {
         maxNodeSizeRatio = nodeTypeStyle[nodeType].sizeRatio;
@@ -381,10 +392,6 @@ const G6component = ({ width, height, data2 }) => {
         minNodeSizeRation = nodeTypeStyle[nodeType].sizeRatio;
       }
     });
-    console.log("maxNodeSizeRatio = ", maxNodeSizeRatio);
-    console.log("minNodeSizeRation = ", minNodeSizeRation);
-
-    console.log("data.nodes = ", data.nodes);
 
     data.nodes.forEach(function (node) {
       if (!node) return;
@@ -394,8 +401,6 @@ const G6component = ({ width, height, data2 }) => {
       if (node.disabledNode == true) {
         nodeType = "disabledNode";
       }
-
-      console.log("nodeType = ", nodeType);
 
       // -------- Change stype based on Type of Node -------
       if (nodeType && nodeTypeStyle[nodeType]) {
@@ -432,7 +437,6 @@ const G6component = ({ width, height, data2 }) => {
 
       const typeNowStyle = nodeTypeStyle[nodeType];
 
-      console.log("typeNowStyle = ", typeNowStyle);
       // -------- Create the Menue of Graph -------
       if (itemsObj[nodeType] == undefined && typeNowStyle != undefined) {
         itemsObj[nodeType] = {
@@ -449,7 +453,6 @@ const G6component = ({ width, height, data2 }) => {
       }
       // -------- Create the Menue of Graph -------
     });
-    console.log("items = ", items);
 
     if (items.length > 1) {
       // Create the Menue of Graph
@@ -470,8 +473,6 @@ const G6component = ({ width, height, data2 }) => {
 
     const nodeTypeNow = checkedItems[itemId].nodeType;
 
-    console.log("checkedItems = ", checkedItems);
-
     const addNodesObj = {};
 
     data2.nodes.forEach(function (node) {
@@ -480,7 +481,7 @@ const G6component = ({ width, height, data2 }) => {
       if (node.disabledNode == true) {
         nodeType = "disabledNode";
       }
-      console.log("nodeType = ", nodeType, nodeTypeNow);
+
       if (nodeType == nodeTypeNow) {
         if (flagChange == true) {
           addNodesObj[node.id] = node;

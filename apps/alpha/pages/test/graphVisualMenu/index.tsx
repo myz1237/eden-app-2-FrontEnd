@@ -104,8 +104,8 @@ const data2: any = {
     {
       id: "node0",
       size: 80,
-      // x: 100,
-      // y: 100,
+      x: 5,
+      y: 5,
       label: "eloi",
       // style: {
       //   fill: "#bae637",
@@ -127,17 +127,17 @@ const data2: any = {
       // },
       // // ----------- Shwow Avatar User ---------
     },
-    { id: "node1", size: 50, label: "sbelka" },
-    { id: "node2", size: 50, label: "waxy" },
-    { id: "node3", size: 50, label: "figma" },
-    { id: "node4", size: 50, label: "UX" },
-    { id: "node5", size: 50, label: "ImpactBilli" },
-    { id: "node6", size: 30 },
-    { id: "node7", size: 30 },
-    { id: "node8", size: 30 },
-    { id: "node9", size: 30 },
-    { id: "node10", size: 30 },
-    { id: "node11", size: 30 },
+    { id: "node1", x: 100, y: 150, size: 50, label: "sbelka" },
+    { id: "node2", x: 10, y: 10, size: 50, label: "waxy" },
+    { id: "node3", x: 20, y: 10, size: 50, label: "figma" },
+    { id: "node4", x: 30, y: 10, size: 50, label: "UX" },
+    { id: "node5", x: 40, y: 10, size: 50, label: "ImpactBilli" },
+    { id: "node6", x: 500, y: 100, size: 30 },
+    { id: "node7", x: 600, y: 100, size: 30 },
+    { id: "node8", x: 700, y: 100, size: 30 },
+    { id: "node9", x: 800, y: 100, size: 30 },
+    { id: "node10", x: 900, y: 100, size: 30 },
+    { id: "node11", x: 1000, y: 100, size: 30 },
   ],
   edges: [
     { source: "node0", target: "node1" },
@@ -360,6 +360,13 @@ const TestPage = () => {
               },
               // ----------- Shwow Avatar User ---------
             };
+            if (node._id == "961730944170090516") {
+              extraStyle = {
+                ...extraStyle,
+                x: 100,
+                y: 100,
+              };
+            }
           }
           if (settingsGraphNow.useAvatar == false && node.avatar != undefined) {
             extraStyle = {
@@ -370,6 +377,11 @@ const TestPage = () => {
               style: {},
               // ----------- Shwow Avatar User ---------
             };
+          }
+
+          // console.log("node = ", node);
+          if (node._id == "961730944170090516") {
+            console.log("change = ----------", extraStyle);
           }
 
           return {
@@ -387,8 +399,6 @@ const TestPage = () => {
           };
         }
       );
-
-      console.log("nodesDataGraph = ", nodesDataGraph[0]);
 
       if (nodesDataGraph.length == 0) {
         nodesDataGraph = [{ id: "node1", size: 50 }];
