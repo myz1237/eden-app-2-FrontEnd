@@ -20,7 +20,7 @@
     "discord-api-types": "^0.37.17",
     "graphql": "^16.6.0",
     "next": "^13.1.5",
-    "next-auth": "^4.18.10",
+    "next-auth": "^4.24.5",
     "next-axiom": "^0.16.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
